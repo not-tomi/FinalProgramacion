@@ -1,3 +1,3 @@
 # FinalProgramacion
 
-gonza putiño
+gonza putiños
