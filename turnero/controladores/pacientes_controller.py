@@ -16,7 +16,7 @@ def cargar_datos_con_API(cantidad=1):
         DatosEnJson = respuesta.json()
 
         # Extraer la información de los pacientes de la clave 'results' en el JSON
-        pacientes = datos_json.get('results', [])
+        pacientes = DatosEnJson.get('results', [])
 
         # Devolver la lista de pacientes
         return pacientes
