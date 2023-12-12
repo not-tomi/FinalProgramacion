@@ -43,7 +43,7 @@ def cargar_datos_con_API(cantidad=1):
         # Guardar los datos en el archivo CSV pacientes.csv en la carpeta modelos
         guardar_datos_en_csv(pacientes, 'modelos/pacientes.csv')
 
-        # Devolver la lista de pacientes
+        # Devuelve la lista de pacientes
         return pacientes
     
     except requests.exceptions.RequestException as e:
@@ -51,5 +51,4 @@ def cargar_datos_con_API(cantidad=1):
         # Devolver None para indicar que la solicitud falló
         return None
 
-# Ejemplo de uso
 cargar_datos_con_API()
