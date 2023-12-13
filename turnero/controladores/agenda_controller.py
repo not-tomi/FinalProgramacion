@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 import csv
 
-agenda_medicos_bp = Blueprint('agenda_medicos_bp', __name__)
+agenda_medicos_bp = Blueprint('agenda_bp', __name__)
 
 def cargar_datos_agenda_medicos():
     datos = []
