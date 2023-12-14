@@ -3,7 +3,7 @@ from controladores.medicos_controller import medicos_bp
 from controladores.pacientes_controller import pacientes_bp
 from controladores.turnos_controller import turnos_bp
 from controladores.agenda_controller import agenda_bp
-# creo los bp de medicos y pacientes por ahora
+# creo los bp 
 app = Flask(__name__)
 
 # Registrar Blueprints 
