@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from modelos.pacientes import pacientes, cargar_pacientes_desde_api
+from modelos.pacientes import pacientes, cargar_pacientes_desde_api_y_guardar_en_csv
 
 pacientes_blueprint = Blueprint("pacientes", __name__)
 
@@ -7,7 +7,7 @@ pacientes_blueprint = Blueprint("pacientes", __name__)
 @pacientes_blueprint.route("/pacientes/cargar-desde-api", methods=["GET"])
 def cargar_pacientes_api():
     cantidad = int(request.args.get("cantidad", 10))
-    cargar_pacientes_desde_api(cantidad)
+    cargar_pacientes_desde_api_y_guardar_en_csv(cantidad)
     return jsonify({"message": f"Se cargaron {cantidad} pacientes desde la API randomuser"})
 
 @pacientes_blueprint.route("/pacientes", methods=["GET"])
