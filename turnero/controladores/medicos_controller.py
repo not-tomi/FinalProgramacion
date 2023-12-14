@@ -1,3 +1,7 @@
+from flask import Blueprint, jsonify
+
+medicos_bp = Blueprint('medicos_bp', __name__)
+
 @medicos_bp.route('/', methods=['GET'])
 def obtener_medicos():
     datos_medicos = cargar_datos_medicos()

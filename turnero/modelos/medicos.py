@@ -1,7 +1,4 @@
-from flask import Blueprint, jsonify
 import csv
-
-medicos_bp = Blueprint('medicos_bp', __name__)
 
 def cargar_datos_medicos():
     datos = []

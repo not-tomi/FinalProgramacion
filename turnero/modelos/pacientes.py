@@ -1,9 +1,7 @@
-from flask import Blueprint, jsonify, request
 import requests
 import csv
 import os
 
-pacientes_bp = Blueprint('pacientes_bp', __name__)
 
 def guardar_datos_en_csv(datos, archivo_csv):
     # Verificar si el directorio existe, si no, crearlo

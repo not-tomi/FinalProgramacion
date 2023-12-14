@@ -1,9 +1,5 @@
-from flask import Blueprint, jsonify, request
 import csv
 import datetime
-
-turnos_bp = Blueprint('turnos_bp', __name__)
-
 def cargar_datos_turnos():
     datos = []
     try:

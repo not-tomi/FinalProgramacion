@@ -1,3 +1,7 @@
+from flask import Blueprint, jsonify, request
+
+turnos_bp = Blueprint('turnos_bp', __name__)
+
 @turnos_bp.route('/', methods=['GET'])
 def obtener_turnos():
     datos_turnos = cargar_datos_turnos()
