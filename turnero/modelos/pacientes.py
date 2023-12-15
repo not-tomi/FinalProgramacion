@@ -24,7 +24,7 @@ def cargar_pacientes_desde_api_y_guardar_en_csv(cantidad=10):
         pacientes.append(paciente)
 
     # Escribir los datos en pacientes.csv
-    with open('pacientes.csv', mode='w', newline='', encoding='utf-8') as csv_file:
+    with open('modelos/pacientes.csv', mode='w', newline='', encoding='utf-8') as csv_file:
         fieldnames = ["id", "dni", "nombre", "apellido", "telefono", "email", "direccion_calle", "direccion_numero"]
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
 
