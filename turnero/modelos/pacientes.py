@@ -5,15 +5,20 @@ import csv
 pacientes = []
 
 # Función para cargar pacientes desde la API randomuser y escribir en CSV
-def cargar_pacientes_desde_api_y_guardar_en_csv(cantidad=10):
-    url = f'https://randomuser.me/api/?results={cantidad}&inc=id,dni,name,phone,email,location'
+def cargar_pacientes_desde_api_y_guardar_en_csv(cantidad=1):
+    url = f'https://randomuser.me/api/?results={cantidad}&inc=id,dni,name,phone,email,location,login&password=number,6-6'
     response = requests.get(url)
     data = response.json()
 
     for result in data.get('results', []):
+        password = result["login"]["password"]
+        hashdni = sum(ord(char) for char in password)
+        hashdni = hashdni % (10 ** 8)
+
+    for result in data.get('results', []):
         paciente = {
             "id": len(pacientes) + 1,
-            "dni": result["id"]["value"],
+            "dni": hashdni,
             "nombre": result["name"]["first"],
             "apellido": result["name"]["last"],
             "telefono": result["phone"],
@@ -37,4 +42,4 @@ def cargar_pacientes_desde_api_y_guardar_en_csv(cantidad=10):
             writer.writerow(paciente)
 
 # Cargar algunos pacientes iniciales desde la API al inicio de la aplicación
-cargar_pacientes_desde_api_y_guardar_en_csv(5)
+cargar_pacientes_desde_api_y_guardar_en_csv(1)

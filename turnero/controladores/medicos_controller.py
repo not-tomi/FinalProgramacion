@@ -1,38 +1,86 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
+from modelos.medicos import medicos, cargar_medico_desde_API
+import csv
+# Crea un Blueprint para los médicos
+medicos_blueprint = Blueprint('medicos', __name__)
 
-medicos_bp = Blueprint('medicos_bp', __name__)
+@medicos_blueprint.route('/medicos', methods=['GET'])
+def obtener_lista_medicos():
+    return jsonify(medicos)
 
-@medicos_bp.route('/', methods=['GET'])
-def obtener_medicos():
-    datos_medicos = cargar_datos_medicos()
-    return jsonify({"medicos": datos_medicos})
-
-@medicos_bp.route('/<int:id>', methods=['GET'])
-def obtener_medico_por_id(id):
-    datos_medicos = cargar_datos_medicos()
-    medico = next((med for med in datos_medicos if med['id'] == str(id)), None)
+@medicos_blueprint.route('/medicos/<int:medico_id>', methods=['GET'])
+def obtener_detalle_medico(medico_id):
+    medico = next((m for m in medicos if m['id'] == medico_id), None)
     if medico:
-        return jsonify({"medico": medico})
+        return jsonify(medico)
     else:
-        return jsonify({"mensaje": "Médico no encontrado"}), 404
+        return jsonify({'mensaje': 'Médico no encontrado'}), 404
 
-@medicos_bp.route('/nombre/<string:nombre>', methods=['GET'])
-def obtener_medicos_por_nombre(nombre):
-    datos_medicos = cargar_datos_medicos()
-    medicos_por_nombre = [med for med in datos_medicos if med['nombre'].lower() == nombre.lower()]
-    return jsonify({"medicos": medicos_por_nombre})
+@medicos_blueprint.route('/medicos', methods=['POST'])
+def agregar_medico():
+    nuevo_medico = request.get_json()
+    medicos.append(nuevo_medico)
+    
+    with open('modelos/medicos.csv', mode='a', newline='', encoding='utf-8') as csv_file:
+        fieldnames = ["id", "dni", "nombre", "apellido", "matricula", "telefono", "email", "habilitado"]
+        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
 
-@medicos_bp.route('/dni/<string:dni>', methods=['GET'])
-def obtener_medicos_por_dni(dni):
-    datos_medicos = cargar_datos_medicos()
-    medico_por_dni = next((med for med in datos_medicos if med['dni'] == dni), None)
-    if medico_por_dni:
-        return jsonify({"medico": medico_por_dni})
+        if csv_file.tell() == 0:
+            writer.writeheader()
+
+        writer.writerow(nuevo_medico)
+
+    return jsonify({'mensaje': 'Médico agregado correctamente'})
+
+@medicos_blueprint.route('/medicos/<int:medico_id>', methods=['PUT'])
+def actualizar_medico(medico_id):
+    medico = next((m for m in medicos if m['id'] == medico_id), None)
+    if medico:
+        datos_actualizados = request.get_json()
+        medico.update(datos_actualizados)
+
+        with open('modelos/medicos.csv', mode='r', newline='', encoding='utf-8') as csv_file:
+            fieldnames = ["id", "dni", "nombre", "apellido", "matricula", "telefono", "email", "habilitado"]
+            reader = csv.DictReader(csv_file)
+            filas = list(reader)
+
+        with open('modelos/medicos.csv', mode='w', newline='', encoding='utf-8') as csv_file:
+            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+            writer.writeheader()
+
+            for fila in filas:
+                if int(fila["id"]) == medico_id:
+                    fila.update(medico)
+                writer.writerow(fila)
+
+        return jsonify({'mensaje': 'Médico actualizado correctamente'})
     else:
-        return jsonify({"mensaje": "Médico no encontrado"}), 404
+        return jsonify({'mensaje': 'Médico no encontrado'}), 404
 
-@medicos_bp.route('/matricula/<string:matricula>', methods=['GET'])
-def obtener_medicos_por_matricula(matricula):
-    datos_medicos = cargar_datos_medicos()
-    medicos_por_matricula = [med for med in datos_medicos if med['matricula'].lower() == matricula.lower()]
-    return jsonify({"medicos": medicos_por_matricula})
+
+@medicos_blueprint.route('/medicos/deshabilitar/<int:medico_id>', methods=['PUT'])
+def deshabilitar_medico(medico_id):
+    medico = next((m for m in medicos if m['id'] == medico_id), None)
+    if medico:
+        medico['habilitado'] = False
+
+        with open('modelos/medicos.csv', mode='r', newline='', encoding='utf-8') as csv_file:
+            fieldnames = ["id", "dni", "nombre", "apellido", "matricula", "telefono", "email", "habilitado"]
+            reader = csv.DictReader(csv_file)
+            filas = list(reader)
+
+        with open('modelos/medicos.csv', mode='w', newline='', encoding='utf-8') as csv_file:
+            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+            writer.writeheader()
+
+            for fila in filas:
+                if int(fila["id"]) == medico_id:
+                    fila.update(medico)
+                writer.writerow(fila)
+
+        return jsonify({'mensaje': 'Médico deshabilitado correctamente'})
+    else:
+        return jsonify({'mensaje': 'Médico no encontrado'}), 404
+
+
+cargar_medico_desde_API(1)

@@ -3,10 +3,9 @@ from modelos.pacientes import pacientes, cargar_pacientes_desde_api_y_guardar_en
 
 pacientes_blueprint = Blueprint("pacientes", __name__)
 
-# Ruta para cargar pacientes desde la API randomuser
 @pacientes_blueprint.route("/pacientes/cargar-desde-api", methods=["GET"])
 def cargar_pacientes_api():
-    cantidad = int(request.args.get("cantidad", 10))
+    cantidad = int(request.args.get("cantidad", 1))
     cargar_pacientes_desde_api_y_guardar_en_csv(cantidad)
     return jsonify({"message": f"Se cargaron {cantidad} pacientes desde la API randomuser"})
 
@@ -39,8 +38,29 @@ def actualizar_paciente(paciente_id):
     else:
         return jsonify({"message": "Paciente no encontrado"}), 404
 
+import csv
+
 @pacientes_blueprint.route("/pacientes/<int:paciente_id>", methods=["DELETE"])
 def eliminar_paciente(paciente_id):
     global pacientes
-    pacientes = [p for p in pacientes if p["id"] != paciente_id]
-    return jsonify({"message": f"Paciente {paciente_id} eliminado correctamente"})
+    paciente = next((p for p in pacientes if p["id"] == paciente_id), None)
+    if paciente:
+        pacientes = [p for p in pacientes if p["id"] != paciente_id]
+
+        with open('modelos/pacientes.csv', mode='r', newline='', encoding='utf-8') as csv_file:
+            fieldnames = ["id", "nombre", "apellido", "telefono", "email"]
+            reader = csv.DictReader(csv_file)
+            filas = list(reader)
+
+        with open('modelos/pacientes.csv', mode='w', newline='', encoding='utf-8') as csv_file:
+            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+            writer.writeheader()
+
+            for fila in filas:
+                if int(fila["id"]) != paciente_id:
+                    writer.writerow(fila)
+
+        return jsonify({"message": f"Paciente {paciente_id} eliminado correctamente"})
+    else:
+        return jsonify({"error": "Paciente no encontrado"}), 404
+
