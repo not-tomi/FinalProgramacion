@@ -1,10 +1,9 @@
 import requests
 import csv
 
-# Lista de pacientes en memoria (diccionarios)
+
 pacientes = []
 
-# Función para cargar pacientes desde la API randomuser y escribir en CSV
 def cargar_pacientes_desde_api_y_guardar_en_csv(cantidad=1):
     url = f'https://randomuser.me/api/?results={cantidad}&inc=id,dni,name,phone,email,location,login&password=number,6-6'
     response = requests.get(url)
@@ -28,18 +27,13 @@ def cargar_pacientes_desde_api_y_guardar_en_csv(cantidad=1):
         }
         pacientes.append(paciente)
 
-    # Escribir los datos en pacientes.csv
     with open('modelos/pacientes.csv', mode='w', newline='', encoding='utf-8') as csv_file:
         fieldnames = ["id", "dni", "nombre", "apellido", "telefono", "email", "direccion_calle", "direccion_numero"]
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
 
-        # Escribir el encabezado solo si el archivo está vacío
         if csv_file.tell() == 0:
             writer.writeheader()
 
-        # Escribir cada paciente en una nueva fila
         for paciente in pacientes:
             writer.writerow(paciente)
-
-# Cargar algunos pacientes iniciales desde la API al inicio de la aplicación
 cargar_pacientes_desde_api_y_guardar_en_csv(1)

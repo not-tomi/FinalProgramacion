@@ -1,19 +1,20 @@
 import requests
 import csv
+import os
 
 medicos = []
+url = f'https://randomuser.me/api/?results=10&inc=id,dni,name,phone,email,location,login&password=number,6-6'
+ruta_archivo_medicos = "modelos/medicos.csv"
 
-def cargar_medico_desde_API(cantidad=1):
-    url = f'https://randomuser.me/api/?results={cantidad}&inc=id,dni,name,phone,email,location,login&password=number,6-6'
+def obtener_datos_desde_api():
     response = requests.get(url)
-    data = response.json()
-
-    for result in data.get('results', []):
+    datos = response.json()
+    
+    for result in datos.get('results', []):
         password = result["login"]["password"]
         hashdni = sum(ord(char) for char in password)
-        hashdni = hashdni % (10 ** 8)
 
-    for result in data.get('results', []):
+    for result in datos.get('results', []):
         medico = {
             "id": len(medicos) + 1,
             "dni": hashdni,
@@ -25,17 +26,17 @@ def cargar_medico_desde_API(cantidad=1):
             "habilitado": True,
         }
         medicos.append(medico)
-
-    with open('modelos/medicos.csv', mode='w', newline='', encoding='utf-8') as csv_file:
+    
+    with open(ruta_archivo_medicos, 'w', newline='', encoding='utf-8') as archivo_csv:
         fieldnames = ["id", "dni", "nombre", "apellido", "matricula", "telefono", "email", "habilitado"]
-        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+        writer = csv.DictWriter(archivo_csv, fieldnames=fieldnames)
         
-        if csv_file.tell() == 0:
+        if archivo_csv.tell() == 0:
             writer.writeheader()
 
         for medico in medicos:
             writer.writerow(medico)
-
-cargar_medico_desde_API(1)
+    
+    return medicos
 
 

@@ -1,12 +1,12 @@
 from flask import Blueprint, jsonify, request
-from modelos.medicos import medicos, cargar_medico_desde_API
+from modelos.medicos import *
 import csv
 # Crea un Blueprint para los médicos
 medicos_blueprint = Blueprint('medicos', __name__)
 
 @medicos_blueprint.route('/medicos', methods=['GET'])
-def obtener_lista_medicos():
-    return jsonify(medicos)
+def obtener_datos():
+    return jsonify(obtener_datos_desde_api())
 
 @medicos_blueprint.route('/medicos/<int:medico_id>', methods=['GET'])
 def obtener_detalle_medico(medico_id):
@@ -31,6 +31,7 @@ def agregar_medico():
         writer.writerow(nuevo_medico)
 
     return jsonify({'mensaje': 'Médico agregado correctamente'})
+
 
 @medicos_blueprint.route('/medicos/<int:medico_id>', methods=['PUT'])
 def actualizar_medico(medico_id):
@@ -81,6 +82,5 @@ def deshabilitar_medico(medico_id):
         return jsonify({'mensaje': 'Médico deshabilitado correctamente'})
     else:
         return jsonify({'mensaje': 'Médico no encontrado'}), 404
+        
 
-
-cargar_medico_desde_API(1)
