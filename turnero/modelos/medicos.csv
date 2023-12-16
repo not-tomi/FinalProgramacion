@@ -1,0 +1,3 @@
+id,dni,nombre,apellido,matricula,telefono,email,habilitado
+1,319,Jayden,Wang,498541,(726)-297-0048,jayden.wang@example.com,True
+2,318,Nicklas,Olsen,667191,34997085,nicklas.olsen@example.com,True
