@@ -1,30 +1,43 @@
-import requests #biblioteca para hacer peticiones http
-import csv
+from flask import Blueprint, jsonify, request
+from modelos.pacientes import pacientes, cargar_pacientes_desde_api_y_guardar_en_csv
 
-def cargar_datos_con_API(cantidad=1):
+pacientes_blueprint = Blueprint("pacientes", __name__)
 
-    url = f'https://randomuser.me/api/?results={cantidad}'
-    
-    try:
-        # Realizar una solicitud GET a la API utilizando la biblioteca 'requests'
-        respuesta = requests.get(url)
+@pacientes_blueprint.route("/pacientes/cargar-desde-api", methods=["GET"])
+def cargar_pacientes_api():
+    return jsonify(cargar_pacientes_desde_api_y_guardar_en_csv())
 
-        # Verificar si hubo errores en la solicitud
-        respuesta.raise_for_status()
+@pacientes_blueprint.route("/pacientes", methods=["GET"])
+def obtener_pacientes():
+    return jsonify({"pacientes": pacientes})
 
-        # Obtener la respuesta en formato JSON
-        DatosEnJson = respuesta.json()
+@pacientes_blueprint.route("/pacientes/<int:paciente_id>", methods=["GET"])
+def obtener_detalle_paciente(paciente_id):
+    paciente = next((p for p in pacientes if p["id"] == paciente_id), None)
+    if paciente:
+        return jsonify({"paciente": paciente})
+    else:
+        return jsonify({"message": "Paciente no encontrado"}), 404
 
-        # Extraer la información de los pacientes de la clave 'results' en el JSON
-        pacientes = DatosEnJson.get('results', [])
+@pacientes_blueprint.route("/pacientes", methods=["POST"])
+def agregar_paciente():
+    nuevo_paciente = request.json
+    nuevo_paciente["id"] = len(pacientes) + 1
+    pacientes.append(nuevo_paciente)
+    return jsonify({"message": "Paciente agregado correctamente"})
 
-        # Devolver la lista de pacientes
-        return pacientes
+@pacientes_blueprint.route("/pacientes/<int:paciente_id>", methods=["PUT"])
+def actualizar_paciente(paciente_id):
+    paciente = next((p for p in pacientes if p["id"] == paciente_id), None)
+    if paciente:
+        datos_actualizados = request.json
+        paciente.update(datos_actualizados)
+        return jsonify({"message": f"Paciente {paciente_id} actualizado correctamente"})
+    else:
+        return jsonify({"message": "Paciente no encontrado"}), 404
 
-    #se guarda el error en la variable e para imprimirlo luego
-    except requests.exceptions.RequestException as e:
-
-        print(f"Error en la solicitud: {e}")
-
-        # Devolver None para indicar que la solicitud falló
-        return None
+@pacientes_blueprint.route("/pacientes/<int:paciente_id>", methods=["DELETE"])
+def eliminar_paciente(paciente_id):
+    global pacientes
+    pacientes = [p for p in pacientes if p["id"] != paciente_id]
+    return jsonify({"message": f"Paciente {paciente_id} eliminado correctamente"})
